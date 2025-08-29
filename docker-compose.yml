@@ -19,6 +19,12 @@ services:
     build:
       context: ./emqx-custom
     container_name: emqx
+    ports:
+      - "1883:1883"
+      - "8083:8083"
+      - "8883:8883"
+      - "18083:18083"
+      - "8084:8084"
     environment:
       EMQX_NAME: emqx
       EMQX_HOST: 127.0.0.1
@@ -27,11 +33,11 @@ services:
       EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__CERTFILE: "/emqx/certs/fullchain.pem"
       EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__KEYFILE: "/emqx/certs/privkey.pem"
       EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__VERIFY: verify_none
-    ports:
-      - "1883:1883"
-      - "8083:8083"
-      - "8883:8883"
-      - "18083:18083"
+      EMQX_LISTENERS__WSS__DEFAULT__BIND: "0.0.0.0:8084"
+      EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__CACERTFILE: "/emqx/certs/chain.pem"
+      EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__CERTFILE: "/emqx/certs/fullchain.pem"
+      EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__KEYFILE: "/emqx/certs/privkey.pem"
+      EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__VERIFY: verify_none
     volumes:
       - "./start-emqx.sh:/start-emqx.sh"
       - "certs:/emqx/certs"
