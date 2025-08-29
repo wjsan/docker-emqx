@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./update-certs-and-setup.sh:/update-certs-and-setup.sh
+      - certs:/certs
+    entrypoint: ["/bin/sh", "-c", "/update-certs-and-setup.sh"]
+    environment:
+      DOMAIN : ${DOMAIN}
+      EMAIL : ${EMAIL}
+    ports:
+      - "80:80"
+    restart: always
+
+  emqx:
+    build:
+      context: ./emqx-custom
+    container_name: emqx
+    environment:
+      EMQX_NAME: emqx
+      EMQX_HOST: 127.0.0.1
+      EMQX_LISTENERS__SSL__DEFAULT__BIND: "0.0.0.0:8883"
+      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__CACERTFILE: "/emqx/certs/chain.pem"
+      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__CERTFILE: "/emqx/certs/fullchain.pem"
+      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__KEYFILE: "/emqx/certs/privkey.pem"
+      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__VERIFY: verify_none
+    ports:
+      - "1883:1883"
+      - "8083:8083"
+      - "8883:8883"
+      - "18083:18083"
+    volumes:
+      - "./start-emqx.sh:/start-emqx.sh"
+      - "certs:/emqx/certs"
+      - "emqx-log:/opt/emqx/log"
+      - "emqx-data:/opt/emqx/data"
+    entrypoint: ["/bin/bash", "/start-emqx.sh"]
+    restart: always
+
+volumes:
+  emqx-data:
+  emqx-log:
+  certs:
