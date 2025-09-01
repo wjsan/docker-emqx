@@ -24,6 +24,7 @@ services:
       - "8083:8083"
       - "8883:8883"
       - "18083:18083"
+      - "18084:18084"
       - "8084:8084"
     environment:
       EMQX_NAME: emqx
@@ -38,6 +39,11 @@ services:
       EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__CERTFILE: "/emqx/certs/fullchain.pem"
       EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__KEYFILE: "/emqx/certs/privkey.pem"
       EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__VERIFY: verify_none
+      EMQX_DASHBOARD__LISTENERS__HTTPS__BIND: "0.0.0.0:18084"
+      EMQX_DASHBOARD__LISTENERS__HTTPS__SSL_OPTIONS__CACERTFILE: "/emqx/certs/chain.pem"
+      EMQX_DASHBOARD__LISTENERS__HTTPS__SSL_OPTIONS__CERTFILE: "/emqx/certs/fullchain.pem"
+      EMQX_DASHBOARD__LISTENERS__HTTPS__SSL_OPTIONS__KEYFILE: "/emqx/certs/privkey.pem"
+      EMQX_DASHBOARD__LISTENERS__HTTPS__SSL_OPTIONS__VERIFY: verify_none
     volumes:
       - "./start-emqx.sh:/start-emqx.sh"
       - "certs:/emqx/certs"
