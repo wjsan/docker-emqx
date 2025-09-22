@@ -52,6 +52,21 @@ services:
     entrypoint: ["/bin/bash", "/start-emqx.sh"]
     restart: always
 
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./nginx.conf.template:/etc/nginx/templates/nginx.conf.template:ro
+      - certs:/etc/nginx/certs:ro
+    ports:
+      - "443:443"
+      - "80:80"
+    depends_on:
+      - emqx
+    restart: always
+
 volumes:
   emqx-data:
   emqx-log:
