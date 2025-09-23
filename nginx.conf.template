@@ -11,10 +11,17 @@ server {
     ssl_certificate     /etc/nginx/certs/fullchain.pem;
     ssl_certificate_key /etc/nginx/certs/privkey.pem;
 
-    # Proxy para API do EMQX
-    location /api/ {
-        proxy_pass http://emqx:18083/;   # ou 18084 se preferir HTTPS interno
+    # Proxy completo para o dashboard EMQX
+    location / {
+        proxy_pass http://emqx:18083/;
         proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
 
         # CORS headers
         add_header 'Access-Control-Allow-Origin' '*' always;
