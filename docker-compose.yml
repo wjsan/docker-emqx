@@ -61,8 +61,8 @@ services:
       - ./nginx.conf.template:/etc/nginx/templates/nginx.conf.template:ro
       - certs:/etc/nginx/certs:ro
     ports:
-      - "443:443"
-      - "80:80"
+      - "8181:8181"
+      - "8080:8080"
     depends_on:
       - emqx
     restart: always
