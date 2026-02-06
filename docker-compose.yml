@@ -60,6 +60,8 @@ services:
     volumes:
       - ./nginx.conf.template:/etc/nginx/templates/nginx.conf.template:ro
       - certs:/etc/nginx/certs:ro
+      - ./start-nginx.sh:/start-nginx.sh:ro
+    entrypoint: ["/bin/sh", "/start-nginx.sh"]
     ports:
       - "8181:8181"
       - "8080:8080"
