@@ -33,3 +33,38 @@ server {
         }
     }
 }
+
+# New HTTPS server to proxy the HTTP service running on port 4000
+# It listens on 4443 and uses the same certificates mounted at /etc/nginx/certs
+server {
+    listen 4443 ssl;
+    server_name ${DOMAIN};
+
+    ssl_certificate     /etc/nginx/certs/fullchain.pem;
+    ssl_certificate_key /etc/nginx/certs/privkey.pem;
+
+    location / {
+        # Proxy to the backend service exposed on host port 4000.
+        # Using host.docker.internal works on Docker Desktop and some setups.
+        # If this name doesn't resolve in your environment, replace with the
+        # host gateway IP (eg. 172.17.0.1) or the container name if on the same network.
+        proxy_pass http://host.docker.internal:4000/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+
+        # CORS headers
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'Authorization, Content-Type' always;
+
+        if ($request_method = OPTIONS) {
+            return 204;
+        }
+    }
+}

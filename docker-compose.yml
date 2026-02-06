@@ -64,6 +64,7 @@ services:
     entrypoint: ["/bin/sh", "/start-nginx.sh"]
     ports:
       - "8181:8181"
+      - "4443:4443"
       - "8080:8080"
     depends_on:
       - emqx
