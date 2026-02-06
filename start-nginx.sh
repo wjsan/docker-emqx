@@ -28,8 +28,15 @@ file_fingerprint() {
   ls -l "$file" 2>/dev/null | awk '{print $5"-"$6}'
 }
 
-# Start nginx in background
-nginx
+# Start nginx via the official entrypoint so templates are processed
+# Run it in background so the watcher loop can run in this container
+if [ -x "/docker-entrypoint.sh" ]; then
+  echo "[start-nginx] starting nginx via /docker-entrypoint.sh"
+  /docker-entrypoint.sh nginx &
+else
+  echo "[start-nginx] /docker-entrypoint.sh not found, starting nginx directly"
+  nginx &
+fi
 
 # wait until certs appear at least once (but don't block indefinitely)
 count=0
